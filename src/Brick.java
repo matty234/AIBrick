@@ -1,25 +1,61 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import lejos.nxt.Button;
+import lejos.nxt.Motor;
 import lejos.nxt.Sound;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
+import lejos.robotics.navigation.DifferentialPilot;
+import lejos.robotics.navigation.Navigator;
+import lejos.robotics.navigation.Waypoint;
+import lejos.robotics.pathfinding.Path;
 
-public class Brick {
+public class Brick implements RCCommand {
 	static BTConnection connection;
 	static DataOutputStream dataOutputStream;
 	static DataInputStream dataInputStream;
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException  {
 		Sound.beep();
 		System.out.println("Mac Address: "+Bluetooth.getLocalAddress());
 		btConnect();
-		while(!Button.ESCAPE.isDown()) {
-			btRead();
+		
+		RobotPacket packet;
+		
+		DifferentialPilot differentialPilot = new DifferentialPilot(65, 140, Motor.A, Motor.B);
+		Navigator navigator = new Navigator(differentialPilot);
+		
+		/*while(!Button.ESCAPE.isDown()) {
+			packet = readRobotPacket();
+			if(packet.getMode() == Modes.NAVIGATE) System.out.println(Arrays.toString(getLocations(packet.commands)));
+			else if(packet.getMode() == Modes.HANDSHAKE) System.out.println("Handshake made");
+		}*/
+		
+		while(true) {
+			packet = readRobotPacket();
+			if(packet.getMode() == Modes.NAVIGATE) {
+				navigator.followPath();
+				Path path = getLocations(packet.commands);
+				navigator.followPath(path);
+			}
 		}
-		btClose();
+		//btClose();
+	}
+
+	private static Path getLocations(byte[] commands) { //only for testing
+		Path waypoints = new Path();
+		for (int i = 0; i < commands.length; i++) {
+			if(commands[i] == HOME) waypoints.add(HOMEPOINT);
+			else if (commands[i] == OFFICE) waypoints.add(OFFICEPOINT);
+			else if (commands[i] == PARK) waypoints.add(PARKPOINT);
+			else if (commands[i] == SHOP) waypoints.add(SHOPPOINT);
+			else;
+		}
+		return waypoints;
 	}
 
 	private static void btConnect() {
@@ -45,6 +81,35 @@ public class Brick {
 		System.out.println(result);
 	}
 	
+	private static RobotPacket readRobotPacket() {
+		byte result = 0x00;
+		try {
+			result = dataInputStream.readByte();
+			if(result == Modes.HANDSHAKE) {
+				btWrite(Modes.HANDSHAKE);
+				return new RobotPacket(Modes.HANDSHAKE, null);
+			} else {
+				int paramsLength = dataInputStream.readByte();
+				byte[] params = new byte[paramsLength];
+				for (int i = 0; i < paramsLength; i++) {
+					byte readByte = dataInputStream.readByte();
+					params[i] = readByte;
+				}
+				return new RobotPacket(result, params);
+			}
+		} catch (IOException e) {
+			System.out.println("Finishing because IO error occurred");
+			Button.waitForAnyPress();
+			System.exit(0);
+		}
+		return null; // Assumed never reached
+	}
+	
+	
+	private static void btWrite(byte b) throws IOException{
+		dataOutputStream.write(b);
+		dataOutputStream.flush();
+	}
 	private static void btClose() throws IOException {
 		dataInputStream.close();
 		dataOutputStream.close();
