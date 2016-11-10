@@ -1,3 +1,4 @@
 *.class
 Brick.nxd
 *.nxj
+/bin/
