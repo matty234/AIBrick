@@ -1,3 +1,4 @@
+package com.geoffbot;
 import lejos.robotics.navigation.Waypoint;
 
 public interface RCCommand {
@@ -6,7 +7,8 @@ public interface RCCommand {
 		  	HANDSHAKE = 0x01,
 		  	REPORT = 0x02,
 		  	MANUAL = 0x03,
-		  	NAVIGATE = 0x04;
+		  	NAVIGATE = 0x04,
+		  	EXIT = 0x05;
 		 
 		 public final byte  // Active Modes
 		  	MOVING = 0x01,
@@ -24,18 +26,5 @@ public interface RCCommand {
 	  	REVERSE = 0x03,
 	  	TURN = 0x04;
 	  	
-	  public final byte  // PILOT
-	  	LOCATION = 0x01;
-	  	
-	  public final byte  // PILOT
-	  	HOME = 0x01,
-	  	SHOP = 0x02,
-	  	PARK = 0x03,
-	  	OFFICE = 0x04;
 	  
-	  public final Waypoint  // PILOT
-	  	HOMEPOINT = new Waypoint(0, 0),
-	  	SHOPPOINT = new Waypoint(300, 900),
-	  	PARKPOINT = new Waypoint(350,400),
-	  	OFFICEPOINT = new Waypoint(800, 500);
 }
