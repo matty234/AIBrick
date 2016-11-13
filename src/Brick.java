@@ -1,16 +1,19 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.ArrayList;
 
 import lejos.nxt.Button;
 import lejos.nxt.Motor;
 import lejos.nxt.Sound;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
+import lejos.robotics.localization.OdometryPoseProvider;
+import lejos.robotics.localization.PoseProvider;
+import lejos.robotics.navigation.DestinationUnreachableException;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.navigation.Navigator;
+import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.pathfinding.Path;
 
@@ -19,7 +22,7 @@ public class Brick implements RCCommand {
 	static DataOutputStream dataOutputStream;
 	static DataInputStream dataInputStream;
 	
-	public static void main(String[] args) throws IOException  {
+	public static void main(String[] args) throws IOException, DestinationUnreachableException, InterruptedException  {
 		Sound.beep();
 		System.out.println("Mac Address: "+Bluetooth.getLocalAddress());
 		btConnect();
@@ -28,26 +31,28 @@ public class Brick implements RCCommand {
 		
 		DifferentialPilot differentialPilot = new DifferentialPilot(65, 140, Motor.A, Motor.B);
 		Navigator navigator = new Navigator(differentialPilot);
+		PoseProvider poseProvider = new OdometryPoseProvider(differentialPilot);
 		
-		/*while(!Button.ESCAPE.isDown()) {
-			packet = readRobotPacket();
-			if(packet.getMode() == Modes.NAVIGATE) System.out.println(Arrays.toString(getLocations(packet.commands)));
-			else if(packet.getMode() == Modes.HANDSHAKE) System.out.println("Handshake made");
-		}*/
+		ShortestMultipointPathFinder  finder = new ShortestMultipointPathFinder(LINEMAP);
 		
 		while(true) {
 			packet = readRobotPacket();
 			if(packet.getMode() == Modes.NAVIGATE) {
 				navigator.followPath();
-				Path path = getLocations(packet.commands);
-				navigator.followPath(path);
+				Waypoint[] waypoints = getLocations(packet.commands);
+				Path[] paths = finder.findPaths(poseProvider.getPose(), waypoints); // Could throw dest unreachable
+				for (int i = 0; i < paths.length; i++) {
+					navigator.followPath(paths[i]);
+					navigator.waitForStop();
+					Thread.sleep(500); // Stopped @ path end
+				}
 			}
 		}
 		//btClose();
 	}
 
-	private static Path getLocations(byte[] commands) { //only for testing
-		Path waypoints = new Path();
+	private static Waypoint[] getLocations(byte[] commands) { //only for testing
+		ArrayList<Waypoint> waypoints = new  ArrayList<>();
 		for (int i = 0; i < commands.length; i++) {
 			if(commands[i] == HOME) waypoints.add(HOMEPOINT);
 			else if (commands[i] == OFFICE) waypoints.add(OFFICEPOINT);
@@ -55,7 +60,7 @@ public class Brick implements RCCommand {
 			else if (commands[i] == SHOP) waypoints.add(SHOPPOINT);
 			else;
 		}
-		return waypoints;
+		return waypoints.toArray(new Waypoint[waypoints.size()]);
 	}
 
 	private static void btConnect() {
