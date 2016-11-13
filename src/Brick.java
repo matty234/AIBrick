@@ -13,7 +13,6 @@ import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.DestinationUnreachableException;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.navigation.Navigator;
-import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.pathfinding.Path;
 
@@ -27,7 +26,6 @@ public class Brick implements RCCommand {
 		System.out.println("Mac Address: "+Bluetooth.getLocalAddress());
 		btConnect();
 		
-		RobotPacket packet;
 		
 		DifferentialPilot differentialPilot = new DifferentialPilot(65, 140, Motor.A, Motor.B);
 		Navigator navigator = new Navigator(differentialPilot);
@@ -36,7 +34,7 @@ public class Brick implements RCCommand {
 		ShortestMultipointPathFinder  finder = new ShortestMultipointPathFinder(LINEMAP);
 		
 		while(true) {
-			packet = readRobotPacket();
+			RobotPacket packet = readRobotPacket();
 			if(packet.getMode() == Modes.NAVIGATE) {
 				navigator.followPath();
 				Waypoint[] waypoints = getLocations(packet.commands);
@@ -119,6 +117,5 @@ public class Brick implements RCCommand {
 		dataInputStream.close();
 		dataOutputStream.close();
 		connection.close();
-
 	}
 }
