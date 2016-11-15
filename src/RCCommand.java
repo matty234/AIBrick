@@ -40,20 +40,21 @@ public interface RCCommand {
 	  
 
 	  public final Waypoint
-	  	HOMEPOINT = new Waypoint(0, 0),
-	  	SHOPPOINT = new Waypoint(300, 900),
-	  	PARKPOINT = new Waypoint(350,400),
-	  	OFFICEPOINT = new Waypoint(800, 500);
+	  	HOMEPOINT = new Waypoint(100, 100),
+	  	SHOPPOINT = new Waypoint(600, 100),
+	  	PARKPOINT = new Waypoint(100, 600),
+	  	OFFICEPOINT = new Waypoint(600, 600);
 	  
 	  
 	  public final Line[] ROADS = {
-			  new Line(0, 0, 300, 900),
-			  new Line(0, 0, 350, 400),
-			  new Line(350, 0, 350, 400)
-
+			  new Line(0, 0, (int) HOMEPOINT.getX(), (int) HOMEPOINT.getY()),
+			  new Line((int) HOMEPOINT.getX(), (int) HOMEPOINT.getY(), (int) SHOPPOINT.getX(), (int) SHOPPOINT.getY()),
+			  new Line((int) SHOPPOINT.getX(), (int) SHOPPOINT.getY(), (int) OFFICEPOINT.getX(), (int) OFFICEPOINT.getY()),
+			  new Line((int) SHOPPOINT.getX(), (int) SHOPPOINT.getY(), (int) PARKPOINT.getX(), (int) PARKPOINT.getY()),
+			  new Line((int) PARKPOINT.getX(), (int) PARKPOINT.getY(), (int) OFFICEPOINT.getX(), (int) OFFICEPOINT.getY()),
 	  };
 	  
-	  public final Rectangle MAPAREA = new Rectangle(0, 0, 1000, 1000);
+	  public final Rectangle MAPAREA = new Rectangle(0, 0, 965, 650);
 	  public final LineMap LINEMAP = new LineMap(ROADS, MAPAREA);
 	  
 	  
