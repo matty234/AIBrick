@@ -1,3 +1,4 @@
+import lejos.robotics.navigation.Waypoint;
 
 public class Destination { // maybe extend it to Waypoint
 	private String name;
