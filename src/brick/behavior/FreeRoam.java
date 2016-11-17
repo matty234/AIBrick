@@ -1,11 +1,16 @@
+package brick.behavior;
 import java.util.ArrayList;
 
+import brick.Grid;
+import brick.RobotPacket;
+import brick.RobotPacketReader;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.navigation.Navigator;
+import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.subsumption.Behavior;
 
 public class FreeRoam implements Behavior {
@@ -13,7 +18,6 @@ public class FreeRoam implements Behavior {
 	private Navigator navigator;
 	private PoseProvider pp;
 	private boolean passControl = false;
-	private RobotPacket rp;
 	private Grid grid;
 //	private ShortestMultipointPathFinder finder;
 	

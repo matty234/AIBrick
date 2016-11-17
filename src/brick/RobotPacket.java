@@ -1,4 +1,4 @@
-
+package brick;
 
 
 public class RobotPacket implements RCCommand{

@@ -1,3 +1,6 @@
+
+package brick;
+
 import java.util.ArrayList;
 
 import lejos.geom.Line;

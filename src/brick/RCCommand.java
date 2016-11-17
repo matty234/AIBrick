@@ -1,3 +1,5 @@
+package brick;
+
 import lejos.geom.Rectangle;
 import lejos.geom.Line;
 import lejos.geom.Point;
@@ -39,7 +41,7 @@ public interface RCCommand {
 	  	OFFICE = 0x04;
 	  
 
-	  public final Waypoint
+	  public final static Waypoint
 	  	HOMEPOINT = new Waypoint(100, 100),
 	  	SHOPPOINT = new Waypoint(600, 100),
 	  	PARKPOINT = new Waypoint(100, 600),

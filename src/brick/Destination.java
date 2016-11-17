@@ -1,3 +1,4 @@
+package brick;
 import lejos.robotics.navigation.Waypoint;
 
 public class Destination { // maybe extend it to Waypoint

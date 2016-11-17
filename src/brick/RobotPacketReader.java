@@ -1,16 +1,20 @@
+package brick;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 
+import lejos.nxt.Button;
 import lejos.nxt.Sound;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
 
-public class RobotPacketReader {
+public class RobotPacketReader implements RCCommand{
 	static BTConnection connection;
 	static DataOutputStream dataOutputStream;
 	static DataInputStream dataInputStream;
 	
-	private static void btConnect() {
+	public static void btConnect() {
 		System.out.println("Waiting for connection");
 		connection = Bluetooth.waitForConnection();
 		Sound.twoBeeps();
@@ -19,7 +23,7 @@ public class RobotPacketReader {
 		dataInputStream = connection.openDataInputStream();
 	}
 	
-	private static void btRead() {
+	public static void btRead() {
 		int result = -1;
 		try {
 			result = dataInputStream.readInt();
@@ -33,7 +37,7 @@ public class RobotPacketReader {
 		System.out.println(result);
 	}
 	
-	private static RobotPacket readRobotPacket() {
+	public static RobotPacket readRobotPacket() {
 		byte result = 0x00;
 		try {
 			result = dataInputStream.readByte();
@@ -58,11 +62,11 @@ public class RobotPacketReader {
 	}
 	
 	
-	private static void btWrite(byte b) throws IOException{
+	public static void btWrite(byte b) throws IOException{
 		dataOutputStream.write(b);
 		dataOutputStream.flush();
 	}
-	private static void btClose() throws IOException {
+	public static void btClose() throws IOException {
 		dataInputStream.close();
 		dataOutputStream.close();
 		connection.close();
