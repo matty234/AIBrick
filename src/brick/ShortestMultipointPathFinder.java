@@ -1,5 +1,7 @@
 package brick;
 
+import java.util.ArrayList;
+
 import lejos.robotics.mapping.LineMap;
 import lejos.robotics.navigation.DestinationUnreachableException;
 import lejos.robotics.navigation.Pose;
@@ -28,16 +30,16 @@ public class ShortestMultipointPathFinder extends ShortestPathFinder{
 		return path;
 	}
 		
-		public Path[] findPaths(Pose start, Waypoint[] points) throws DestinationUnreachableException {
-			Path[] paths = new Path[points.length];
-			for (int i = 0; i < points.length; i++) {
+		public Path[] findPaths(Pose start, ArrayList<Waypoint> waypoints) throws DestinationUnreachableException {
+			Path[] paths = new Path[waypoints.size()];
+			for (int i = 0; i < waypoints.size(); i++) {
 				Pose nextStartPoint;
 				if(i == 0){
 					nextStartPoint = start;
 				} else {
-					nextStartPoint = points[i-1].getPose();
+					nextStartPoint = waypoints.get(i-1).getPose();
 				}
-				Waypoint endPoint = new Waypoint(points[i].getX(), points[i].getY(), points[i].getHeading());
+				Waypoint endPoint = new Waypoint(waypoints.get(i).getX(), waypoints.get(i).getY(), waypoints.get(i).getHeading());
 				paths[i] = super.findRoute(nextStartPoint, endPoint);
 			}	
 		

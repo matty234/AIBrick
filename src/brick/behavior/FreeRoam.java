@@ -28,8 +28,6 @@ public class FreeRoam implements Behavior {
 		grid = new Grid(1000, wp);
 	}
 	
-	
-	
 	@Override
 	public boolean takeControl() {
 		return !passControl;

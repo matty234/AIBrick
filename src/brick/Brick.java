@@ -4,52 +4,70 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import brick.behavior.FollowPath;
 import lejos.nxt.Button;
+import lejos.nxt.ButtonListener;
 import lejos.nxt.Motor;
 import lejos.nxt.Sound;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
-import lejos.robotics.localization.OdometryPoseProvider;
-import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.DestinationUnreachableException;
 import lejos.robotics.navigation.DifferentialPilot;
-import lejos.robotics.navigation.Navigator;
 import lejos.robotics.navigation.Waypoint;
-import lejos.robotics.pathfinding.Path;
+import lejos.robotics.subsumption.Arbitrator;
+import lejos.robotics.subsumption.Behavior;
 
-public class Brick implements RCCommand {
+public class Brick implements RCCommand, ButtonListener {
 	static BTConnection connection;
 	static DataOutputStream dataOutputStream;
 	static DataInputStream dataInputStream;
 	public static DifferentialPilot differentialPilot;
+	private final static String IOERR = "Finishing for IO err";
+	
 	public static void main(String[] args) throws IOException, DestinationUnreachableException, InterruptedException  {
 		Sound.beep();
 		System.out.println("Mac Address: "+Bluetooth.getLocalAddress());
 		btConnect();				
 		
+		
+		Button.RIGHT.addButtonListener(new Brick()); 
+
 		differentialPilot = new DifferentialPilot(57, 120, Motor.A, Motor.B);
-		Navigator navigator = new Navigator(differentialPilot);
-		PoseProvider poseProvider = new OdometryPoseProvider(differentialPilot);
+		FollowPath followPath = new FollowPath();
+		Behavior[] behaviorList = {followPath};
+		Arbitrator arb = new Arbitrator(behaviorList);
+		arb.start();
 		
-		ShortestMultipointPathFinder  finder = new ShortestMultipointPathFinder(LINEMAP);
 		
-		while(true) {
-			RobotPacket packet = readRobotPacket();
+		RobotPacket packet;
+		while((packet = readRobotPacket()) != null) {
 			if(packet.getMode() == Modes.NAVIGATE) {
-				navigator.followPath();
-				Waypoint[] waypoints = getLocations(packet.commands);
-				Path[] paths = finder.findPaths(poseProvider.getPose(), waypoints); // Could throw dest unreachable
-				for (int i = 0; i < paths.length; i++) {
-					navigator.followPath(paths[i]);
-					navigator.waitForStop();
-					Thread.sleep(500); // Stopped @ path end
-				}
+				ArrayList<Waypoint> waypoints = getWaypoints(packet.commands);
+				followPath.addAllWayPoints(waypoints);
+				FollowPath.SHOULD_TAKE_CONTROL = true;
+			}
+			else if(packet.getMode() == Modes.HANDSHAKE) System.out.println("Handshake made");
+			else System.out.println("Packet received?");
+		}
+		btClose();
+
+		System.out.println("Closed. New connection (center)?");
+		int pressedButton = 0;
+		while ((pressedButton = Button.waitForAnyPress(10000)) != 0){
+			switch (pressedButton) {
+			case Button.ID_ESCAPE:
+				break;
+			case Button.ID_ENTER:
+				main(args);
+			default:
+				break;
 			}
 		}
-		//btClose();
+		System.out.println("Good Bye!");
+		
 	}
 
-	private static Waypoint[] getLocations(byte[] commands) { //only for testing
+	private static ArrayList<Waypoint> getWaypoints(byte[] commands) { //only for testing
 		ArrayList<Waypoint> waypoints = new  ArrayList<>();
 		for (int i = 0; i < commands.length; i++) {
 			if(commands[i] == HOME) waypoints.add(HOMEPOINT);
@@ -58,7 +76,7 @@ public class Brick implements RCCommand {
 			else if (commands[i] == SHOP) waypoints.add(SHOPPOINT);
 			else;
 		}
-		return waypoints.toArray(new Waypoint[waypoints.size()]);
+		return waypoints;
 	}
 
 	private static void btConnect() {
@@ -77,7 +95,7 @@ public class Brick implements RCCommand {
 			dataOutputStream.writeInt(result);
 			dataOutputStream.flush();
 		} catch (IOException e) {
-			System.out.println("Finishing because IO error occurred");
+			System.out.println(IOERR);
 			Button.waitForAnyPress();
 			System.exit(0);
 		}
@@ -91,6 +109,8 @@ public class Brick implements RCCommand {
 			if(result == Modes.HANDSHAKE) {
 				btWrite(Modes.HANDSHAKE);
 				return new RobotPacket(Modes.HANDSHAKE, null);
+			} else if(result == Modes.EXIT) {
+				return null;
 			} else {
 				int paramsLength = dataInputStream.readByte();
 				byte[] params = new byte[paramsLength];
@@ -99,9 +119,9 @@ public class Brick implements RCCommand {
 					params[i] = readByte;
 				}
 				return new RobotPacket(result, params);
-			}
+			} 
 		} catch (IOException e) {
-			System.out.println("Finishing because IO error occurred");
+			System.out.println(IOERR+"(U/S Exit)");
 			Button.waitForAnyPress();
 			System.exit(0);
 		}
@@ -118,4 +138,12 @@ public class Brick implements RCCommand {
 		dataOutputStream.close();
 		connection.close();
 	}
+
+	@Override
+	public void buttonPressed(Button b) {
+		FollowPath.SHOULD_TAKE_CONTROL = !FollowPath.SHOULD_TAKE_CONTROL;
+	}
+
+	@Override
+	public void buttonReleased(Button b) {}
 }
