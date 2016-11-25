@@ -1,8 +1,9 @@
 import java.util.ArrayList;
 
 import lejos.geom.Point;
+import lejos.nxt.Button;
 import lejos.nxt.SensorPort;
-import lejos.nxt.TouchSensor;
+import lejos.nxt.SoundSensor;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.DifferentialPilot;
@@ -11,50 +12,39 @@ import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.pathfinding.Path;
 import lejos.robotics.subsumption.Behavior;
 
-public class FreeRoam implements Behavior {
-	
-	private TouchSensor ts;
+public class WaitForClap implements Behavior {
+
+	private SoundSensor ss;
 	private Navigator navigator;
 	private static PoseProvider pp;
 	private boolean passControl = false;
 	
-	public FreeRoam(SensorPort sp, DifferentialPilot p, ArrayList<Waypoint> wp){
-		ts = new TouchSensor(sp);
-		navigator = new Navigator(p);
-		pp = new OdometryPoseProvider(p);
+	public WaitForClap(SensorPort sp, DifferentialPilot dp){
+		ss = new SoundSensor(sp);
+		navigator = new Navigator(dp);
+		pp = new OdometryPoseProvider(dp);
 	}
-	
-	
 	
 	@Override
 	public boolean takeControl() {
-		return !passControl;
+		return passControl;
 	}
 
 	@Override
 	public void action() {
 		Path[] paths;
-		while(!passControl){
+		
+		while(!passControl && Brick.packet.getMode() == RCCommand.Modes.NAVIGATE){
+			paths = getPaths(Brick.packet.commands);
 			
-			if(Brick.packet.getMode() == RCCommand.Modes.NAVIGATE){
-				paths = getPaths(Brick.packet.commands);
-				
-				for(Path p: paths){
-					navigator.followPath(p);
-					navigator.waitForStop();
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-				passControl = ts.isPressed();
+			for(Path p : paths){
+				navigator.followPath(p);
+				navigator.waitForStop();
+				while(ss.readValue() < 55);
 			}
 			
+			passControl = Button.ENTER.isDown();
 		}
-		
 	}
 	
 	private static Path[] getPaths(byte[] commands) {
@@ -76,7 +66,8 @@ public class FreeRoam implements Behavior {
 
 	@Override
 	public void suppress() {
-		System.out.println("Free Roam ended");
+		// TODO Auto-generated method stub
+
 	}
-	
+
 }
