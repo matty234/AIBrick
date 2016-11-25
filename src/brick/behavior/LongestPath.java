@@ -68,8 +68,8 @@ public class LongestPath implements Behavior {
 		ArrayList<Waypoint> newWP = new ArrayList<Waypoint>();
 		newWP.add(first);
 		
-		for(Path p : paths){
-			for(int i = 1; i<wp.length-1; i++){
+		for(int i = 1; i<wp.length-1; i++){
+			for(Path p : paths){
 				if(!p.contains(wp[i]) && !wp[i].equals(last))
 					newWP.add(wp[i]);
 			}
