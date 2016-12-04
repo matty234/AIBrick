@@ -30,10 +30,9 @@ public class BluetoothListener implements Runnable, RCCommand {
 		RobotPacket packet;
 		while((packet = readRobotPacket()) != null) {
 			if(packet.getMode() == Modes.NAVIGATE) {
-				
-				ArrayList<Waypoint> waypoints = getWaypoints(packet.commands);
-				FollowPath.addAllWayPoints(waypoints);
-				FollowPath.SHOULD_TAKE_CONTROL = true;
+					ArrayList<Waypoint> waypoints = getWaypoints(packet.commands);
+					FollowPath.addAllWayPoints(waypoints);
+					FollowPath.SHOULD_TAKE_CONTROL = true;
 				}
 			else if(packet.getMode() == Modes.HANDSHAKE) System.out.println("Handshake made");
 			else System.out.println("Packet received?");

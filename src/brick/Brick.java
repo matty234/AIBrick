@@ -8,8 +8,7 @@ import brick.behavior.FreeRoam;
 import brick.handler.EndOfPathHandler;
 import brick.listeners.BluetoothListener;
 import brick.listeners.CustomButtonListener;
-import brick.listeners.SoundListener;
-import brick.listeners.UltrasonicListener;
+import brick.listeners.CustomSensorPortListener;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
@@ -36,14 +35,12 @@ public class Brick implements RCCommand {
 	private static PoseProvider poseProvider = new OdometryPoseProvider(differentialPilot);
 
 
-	private static SensorPort lightSensorPort = SensorPort.S1, soundSensorPort = SensorPort.S4, ultrasonicSensorPort = SensorPort.S3;
+	public static SensorPort lightSensorPort = SensorPort.S1, soundSensorPort = SensorPort.S4, ultrasonicSensorPort = SensorPort.S3;
 
 	public static LightSensor lightSensor = new LightSensor(lightSensorPort);
 	public static UltrasonicSensor ultrasonicSensor = new UltrasonicSensor(ultrasonicSensorPort);
 	public static SoundSensor soundSensor = new SoundSensor(soundSensorPort);
 
-	private static UltrasonicListener ultrasonicListener = new UltrasonicListener(ultrasonicSensor);
-	private static SoundListener soundListener;
 
 	private static CustomButtonListener buttonListener = new CustomButtonListener();
 
@@ -52,6 +49,7 @@ public class Brick implements RCCommand {
 	private static Collision collisionBehavior = new Collision(navigator);
 	private static BluetoothListener bluetoothListener;
 
+	private static CustomSensorPortListener customSensorPortListener = new CustomSensorPortListener(ultrasonicSensor);
 	public static void main(String[] args) throws IOException, DestinationUnreachableException, InterruptedException {
 		Sound.beep();
 		setup();
@@ -72,18 +70,16 @@ public class Brick implements RCCommand {
 	}
 
 	private static void addListeners() {
-		ultrasonicSensorPort.addSensorPortListener(ultrasonicListener);
-		soundListener = new SoundListener(new NotifyWait() {
-			@Override
-			public void pushNotify() {
-				followPathBehavior.notifyAll(); // No idea if this will work ;)
-			}
-		});
-		soundSensorPort.addSensorPortListener(soundListener);
+		
+		ultrasonicSensorPort.addSensorPortListener(customSensorPortListener);
+		lightSensorPort.addSensorPortListener(customSensorPortListener);
+		soundSensorPort.addSensorPortListener(customSensorPortListener);
+		
+		
 		Button.ESCAPE.addButtonListener(buttonListener);
 		Button.ENTER.addButtonListener(buttonListener);
 		bluetoothListener = new BluetoothListener(connection);
-		followPathBehavior.addOnEndOfPathHandler(new EndOfPathHandler() {
+		setEndOfPathHandler(new EndOfPathHandler() {
 			@Override
 			public void onEndOfPath(int fare) {
 				try {
@@ -109,5 +105,9 @@ public class Brick implements RCCommand {
 		LCD.clear();
 		addListeners();
 		System.out.println("Setup complete...");		
+	}
+	
+	public static void setEndOfPathHandler(EndOfPathHandler endOfPathHandler) {
+		followPathBehavior.addOnEndOfPathHandler(endOfPathHandler);
 	}
 }
