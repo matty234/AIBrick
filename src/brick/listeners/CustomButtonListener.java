@@ -14,6 +14,7 @@ public class CustomButtonListener implements ButtonListener{
 			FreeRoam.SHOULD_TAKE_CONTROL = !FreeRoam.SHOULD_TAKE_CONTROL;
 			break;
 		case Button.ID_ESCAPE:
+			System.out.println("Force stop...");
 			Brick.connection.close();
 			System.exit(0);
 		default:

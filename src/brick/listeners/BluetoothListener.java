@@ -24,14 +24,9 @@ public class BluetoothListener implements Runnable, RCCommand {
 		dataOutputStream = btConnection.openDataOutputStream();
 		dataInputStream = btConnection.openDataInputStream();
 	}
-	
 
-	
-
-	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		RobotPacket packet;
 		while((packet = readRobotPacket()) != null) {
 			if(packet.getMode() == Modes.NAVIGATE) {
@@ -44,6 +39,21 @@ public class BluetoothListener implements Runnable, RCCommand {
 			else System.out.println("Packet received?");
 		}
 	}
+	
+	
+	public void writeRobotPacket(RobotPacket packet) throws IOException {
+		try{
+			btWrite(packet.getMode());
+			btWrite((byte) packet.getLength());
+			for (int i = 0; i < packet.getLength(); i++) {
+				btWrite(packet.getCommands()[i]);
+			}
+		} catch (IOException e) {
+			System.out.println(Brick.IOERR+" (U/S Exit)");
+			Button.waitForAnyPress();
+		}
+	}
+	
 	
 	private static RobotPacket readRobotPacket() {
 		byte result = 0x00;

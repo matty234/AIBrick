@@ -14,7 +14,8 @@ public interface RCCommand {
 		  	REPORT = 0x02,
 		  	MANUAL = 0x03,
 		  	NAVIGATE = 0x04,
-		  	EXIT = 0x05;
+		  	FARE = 0x05,
+		  	EXIT = 0x06;
 		 
 		 public final byte  // Active Modes
 		  	MOVING = 0x01,
@@ -61,7 +62,9 @@ public interface RCCommand {
 	  public final Rectangle MAPAREA = new Rectangle(0, 0, 965, 650);
 	  public final LineMap LINEMAP = new LineMap(ROADS, MAPAREA);
 	  
-	  
+
 	  
 	  public DijkstraPathFinder PATHFINDER = new DijkstraPathFinder(LINEMAP);
+	  public final static String IOERR = "Finishing for IO err";
+
 }

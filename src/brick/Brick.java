@@ -1,16 +1,17 @@
 package brick;
 
-import java.io.File;
 import java.io.IOException;
 
 import brick.behavior.Collision;
-import brick.behavior.DisposableSetup;
 import brick.behavior.FollowPath;
 import brick.behavior.FreeRoam;
+import brick.handler.EndOfPathHandler;
 import brick.listeners.BluetoothListener;
 import brick.listeners.CustomButtonListener;
+import brick.listeners.SoundListener;
 import brick.listeners.UltrasonicListener;
 import lejos.nxt.Button;
+import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
@@ -19,16 +20,21 @@ import lejos.nxt.SoundSensor;
 import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
+import lejos.robotics.localization.OdometryPoseProvider;
+import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.DestinationUnreachableException;
 import lejos.robotics.navigation.DifferentialPilot;
+import lejos.robotics.navigation.Navigator;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 
 public class Brick implements RCCommand {
 	public static BTConnection connection;
 
-	public static DifferentialPilot differentialPilot = new DifferentialPilot(57, 120, Motor.A, Motor.B);
-	public final static String IOERR = "Finishing for IO err";
+	private static DifferentialPilot differentialPilot = new DifferentialPilot(57, 120, Motor.A, Motor.B);
+	private static Navigator navigator = new Navigator(differentialPilot);
+	private static PoseProvider poseProvider = new OdometryPoseProvider(differentialPilot);
+
 
 	private static SensorPort lightSensorPort = SensorPort.S1, soundSensorPort = SensorPort.S4, ultrasonicSensorPort = SensorPort.S3;
 
@@ -37,21 +43,21 @@ public class Brick implements RCCommand {
 	public static SoundSensor soundSensor = new SoundSensor(soundSensorPort);
 
 	private static UltrasonicListener ultrasonicListener = new UltrasonicListener(ultrasonicSensor);
+	private static SoundListener soundListener;
+
 	private static CustomButtonListener buttonListener = new CustomButtonListener();
 
-	private static FollowPath followPathBehavior = new FollowPath();
-	private static FreeRoam freeRoamBehavior = new FreeRoam();
-	private static Collision collisionBehavior = new Collision();
+	private static FollowPath followPathBehavior = new FollowPath(navigator, poseProvider);
+	private static FreeRoam freeRoamBehavior = new FreeRoam(navigator, poseProvider);
+	private static Collision collisionBehavior = new Collision(navigator);
 	private static BluetoothListener bluetoothListener;
 
 	public static void main(String[] args) throws IOException, DestinationUnreachableException, InterruptedException {
 		Sound.beep();
-		System.out.println("Mac: " + Bluetooth.getLocalAddress());
-		btConnect();
-
-		addListeners();
+		setup();
 		Behavior[] behaviorList = { freeRoamBehavior, followPathBehavior, collisionBehavior };
 
+		
 		Arbitrator arb = new Arbitrator(behaviorList);
 		arb.start();
 		Button.waitForAnyPress();
@@ -67,10 +73,41 @@ public class Brick implements RCCommand {
 
 	private static void addListeners() {
 		ultrasonicSensorPort.addSensorPortListener(ultrasonicListener);
+		soundListener = new SoundListener(new NotifyWait() {
+			@Override
+			public void pushNotify() {
+				followPathBehavior.notifyAll(); // No idea if this will work ;)
+			}
+		});
+		soundSensorPort.addSensorPortListener(soundListener);
 		Button.ESCAPE.addButtonListener(buttonListener);
 		Button.ENTER.addButtonListener(buttonListener);
 		bluetoothListener = new BluetoothListener(connection);
+		followPathBehavior.addOnEndOfPathHandler(new EndOfPathHandler() {
+			@Override
+			public void onEndOfPath(int fare) {
+				try {
+					bluetoothListener.writeRobotPacket(new RobotPacket(RCCommand.Modes.FARE, (byte) fare));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 		new Thread(bluetoothListener).start();
 
+	}
+	
+	private static void setup() {
+		System.out.println("Mac: " + Bluetooth.getLocalAddress());
+		System.out.println("\n1) Calibration");
+		System.out.println("  Place robot at (0, 0)");
+		Button.ENTER.waitForPress();
+		LCD.clear();
+		System.out.println("2) Connection");
+		System.out.println("  Connect to the Robot (TaxiBot)");
+		btConnect();
+		LCD.clear();
+		addListeners();
+		System.out.println("Setup complete...");		
 	}
 }

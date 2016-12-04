@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import brick.Brick;
 import brick.RCCommand;
 import brick.ShortestMultipointPathFinder;
+import brick.handler.EndOfPathHandler;
 import lejos.nxt.Sound;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
@@ -16,13 +17,13 @@ import lejos.robotics.subsumption.Behavior;
 
 public class FollowPath implements Behavior, RCCommand {
 	//Path path;
-	Navigator navigator = new Navigator(Brick.differentialPilot);
-	PoseProvider poseProvider = new OdometryPoseProvider(Brick.differentialPilot);
-
+	Navigator navigator;
+	PoseProvider poseProvider;
 	ShortestMultipointPathFinder finder = new ShortestMultipointPathFinder(LINEMAP);
-	public static boolean SHOULD_TAKE_CONTROL = false;;
+	public static boolean SHOULD_TAKE_CONTROL = false;
+	public static boolean CONTINUE = false;
 	static ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
-
+	public EndOfPathHandler endOfPathHandler;
 
 	public FollowPath(Waypoint[] waypoints) {
 		for (int i = 0; i < waypoints.length; i++) {
@@ -30,7 +31,8 @@ public class FollowPath implements Behavior, RCCommand {
 		}
 	}
 
-	public FollowPath() {
+	public FollowPath(Navigator navigator, PoseProvider poseProvider) {
+		this.navigator = navigator;
 	}
 
 	@Override
@@ -52,6 +54,7 @@ public class FollowPath implements Behavior, RCCommand {
 				navigator.followPath(paths[i]);
 				navigator.waitForStop();
 				try {
+					this.wait(); // Could cause problemos
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -59,7 +62,10 @@ public class FollowPath implements Behavior, RCCommand {
 				}
 			}
 			System.out.println("Route Finished!");
-			//this.waypoints.clear();
+			if(endOfPathHandler != null && waypoints.size() > 0) {
+				endOfPathHandler.onEndOfPath(6); // TODO Actually calculate distance
+			}
+			waypoints.clear();
 			Sound.systemSound(false, 3);
 			SHOULD_TAKE_CONTROL = false;
 
@@ -81,6 +87,10 @@ public class FollowPath implements Behavior, RCCommand {
 	public static void addAllWayPoints(ArrayList<Waypoint> wp) {
 		waypoints.clear();
 		waypoints.addAll(wp);
+	}
+	
+	public void addOnEndOfPathHandler(EndOfPathHandler endOfPathHandler) {
+		this.endOfPathHandler = endOfPathHandler;
 	}
 
 }

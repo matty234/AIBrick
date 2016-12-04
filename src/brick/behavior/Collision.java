@@ -1,15 +1,18 @@
 package brick.behavior;
 
-import brick.Brick;
-import lejos.nxt.Sound;
+import lejos.robotics.navigation.Navigator;
 import lejos.robotics.subsumption.Behavior;
 
 public  class Collision implements Behavior{
 	public static boolean SHOULD_TAKE_CONTROL = false;
+	private Navigator navigator;
 	
-	public void hasObstacle() {
-		SHOULD_TAKE_CONTROL = true;
+	public Collision(Navigator navigator) {
+		this.navigator = navigator;
 	}
+	
+
+	
 	@Override
 	public boolean takeControl() {
 		return SHOULD_TAKE_CONTROL;
@@ -17,8 +20,7 @@ public  class Collision implements Behavior{
 
 	@Override
 	public void action() {
-		Brick.differentialPilot.quickStop();
-		Sound.playNote(Sound.PIANO, 1000, 3000);
+		navigator.stop();
 	}
 
 	@Override

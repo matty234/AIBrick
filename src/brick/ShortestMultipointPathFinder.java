@@ -12,7 +12,8 @@ import lejos.robotics.pathfinding.ShortestPathFinder;
 public class ShortestMultipointPathFinder extends ShortestPathFinder{
 
 	public ShortestMultipointPathFinder(LineMap map) {
-		super(map);
+		super(map); 
+		/* This prints a really annoying message from the super constructor */
 	}
 
 	public Path findRoute(Pose start, Waypoint[] points) throws DestinationUnreachableException {

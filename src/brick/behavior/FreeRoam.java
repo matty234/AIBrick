@@ -8,6 +8,7 @@ import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.DestinationUnreachableException;
 import lejos.robotics.navigation.Navigator;
+import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.pathfinding.Path;
 import lejos.robotics.pathfinding.ShortestPathFinder;
@@ -16,15 +17,15 @@ import lejos.robotics.subsumption.Behavior;
 public class FreeRoam implements Behavior, RCCommand {
 	
 	public static  boolean SHOULD_TAKE_CONTROL = false;
-	PoseProvider poseProvider = new OdometryPoseProvider(Brick.differentialPilot);
 	ShortestPathFinder finder = new ShortestPathFinder(LINEMAP);
+	PoseProvider poseProvider;
 	Navigator navigator;
+
 	
-	{
-		navigator = new Navigator(Brick.differentialPilot);
+	public FreeRoam(Navigator navigator, PoseProvider poseProvider){
+		this.navigator = navigator;
+		this.poseProvider = poseProvider;
 	}
-	
-	public FreeRoam(){}
 	
 	
 	@Override
