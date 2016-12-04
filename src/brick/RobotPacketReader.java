@@ -30,7 +30,7 @@ public class RobotPacketReader implements RCCommand{
 			dataOutputStream.writeInt(result);
 			dataOutputStream.flush();
 		} catch (IOException e) {
-			System.out.println("Finishing because IO error occurred");
+			System.out.println(Brick.IOERR);
 			Button.waitForAnyPress();
 			System.exit(0);
 		}
@@ -54,7 +54,7 @@ public class RobotPacketReader implements RCCommand{
 				return new RobotPacket(result, params);
 			}
 		} catch (IOException e) {
-			System.out.println("Finishing because IO error occurred");
+			System.out.println(Brick.IOERR);
 			Button.waitForAnyPress();
 			System.exit(0);
 		}

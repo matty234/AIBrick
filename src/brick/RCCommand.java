@@ -48,6 +48,7 @@ public interface RCCommand {
 	  	PARKPOINT = new Waypoint(100, 600),
 	  	OFFICEPOINT = new Waypoint(600, 600);
 	  
+	  public final static Waypoint[] WAYPOINTS = {HOMEPOINT, SHOPPOINT, PARKPOINT, OFFICEPOINT};
 	  
 	  public final Line[] ROADS = {
 			  new Line(0, 0, (int) HOMEPOINT.getX(), (int) HOMEPOINT.getY()),

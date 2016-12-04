@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import brick.Brick;
 import brick.RCCommand;
 import brick.ShortestMultipointPathFinder;
+import lejos.nxt.Sound;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.DestinationUnreachableException;
@@ -14,18 +15,14 @@ import lejos.robotics.pathfinding.Path;
 import lejos.robotics.subsumption.Behavior;
 
 public class FollowPath implements Behavior, RCCommand {
-	Path path;
-	Navigator navigator;
+	//Path path;
+	Navigator navigator = new Navigator(Brick.differentialPilot);
 	PoseProvider poseProvider = new OdometryPoseProvider(Brick.differentialPilot);
 
 	ShortestMultipointPathFinder finder = new ShortestMultipointPathFinder(LINEMAP);
-	public static boolean SHOULD_TAKE_CONTROL;
-	ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
+	public static boolean SHOULD_TAKE_CONTROL = false;;
+	static ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
 
-	{
-		navigator = new Navigator(Brick.differentialPilot);
-		SHOULD_TAKE_CONTROL = false;
-	}
 
 	public FollowPath(Waypoint[] waypoints) {
 		for (int i = 0; i < waypoints.length; i++) {
@@ -38,14 +35,11 @@ public class FollowPath implements Behavior, RCCommand {
 
 	@Override
 	public boolean takeControl() {
-		return (path != null) && SHOULD_TAKE_CONTROL;
+		return  SHOULD_TAKE_CONTROL; //(this.waypoints.size() > 0) &&
 	}
 
 	@Override
 	public void action() {
-		if (!navigator.isMoving()) {
-			navigator.followPath();
-		} else {
 			Path[] paths;
 			try {
 				paths = finder.findPaths(poseProvider.getPose(), waypoints);
@@ -64,22 +58,29 @@ public class FollowPath implements Behavior, RCCommand {
 					return;
 				}
 			}
-		}
+			System.out.println("Route Finished!");
+			//this.waypoints.clear();
+			Sound.systemSound(false, 3);
+			SHOULD_TAKE_CONTROL = false;
 
 	}
 
 	@Override
 	public void suppress() {
+		System.out.println("Supressed");
 		navigator.stop();
 		SHOULD_TAKE_CONTROL = false;
+
 	}
 
-	public void addWayPoint(Waypoint waypoint) {
-		this.waypoints.add(waypoint);
+	
+	public static void addWayPoint(Waypoint waypoint) {
+		waypoints.add(waypoint);
 	}
 
-	public void addAllWayPoints(ArrayList<Waypoint> waypoints) {
-		this.waypoints.addAll(waypoints);
+	public static void addAllWayPoints(ArrayList<Waypoint> wp) {
+		waypoints.clear();
+		waypoints.addAll(wp);
 	}
 
 }
