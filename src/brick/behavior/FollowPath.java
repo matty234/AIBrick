@@ -6,6 +6,7 @@ import brick.Brick;
 import brick.RCCommand;
 import brick.ShortestMultipointPathFinder;
 import brick.handler.EndOfPathHandler;
+import lejos.nxt.Motor;
 import lejos.nxt.Sound;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
@@ -25,14 +26,10 @@ public class FollowPath implements Behavior, RCCommand {
 	static ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
 	public EndOfPathHandler endOfPathHandler;
 
-	public FollowPath(Waypoint[] waypoints) {
-		for (int i = 0; i < waypoints.length; i++) {
-			this.waypoints.add(waypoints[i]);
-		}
-	}
 
 	public FollowPath(Navigator navigator, PoseProvider poseProvider) {
 		this.navigator = navigator;
+		this.poseProvider = poseProvider;
 	}
 
 	@Override
@@ -42,6 +39,7 @@ public class FollowPath implements Behavior, RCCommand {
 
 	@Override
 	public void action() {
+		int initTachoCount = Motor.A.getTachoCount();
 			Path[] paths;
 			try {
 				paths = finder.findPaths(poseProvider.getPose(), waypoints);
@@ -54,7 +52,6 @@ public class FollowPath implements Behavior, RCCommand {
 				navigator.followPath(paths[i]);
 				navigator.waitForStop();
 				try {
-					this.wait(); // Could cause problemos
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -63,7 +60,7 @@ public class FollowPath implements Behavior, RCCommand {
 			}
 			System.out.println("Route Finished!");
 			if(endOfPathHandler != null && waypoints.size() > 0) {
-				endOfPathHandler.onEndOfPath(6); // TODO Actually calculate distance
+				endOfPathHandler.onEndOfPath(Motor.A.getTachoCount()-initTachoCount); // TODO Actually calculate distance
 			}
 			waypoints.clear();
 			Sound.systemSound(false, 3);
@@ -81,6 +78,7 @@ public class FollowPath implements Behavior, RCCommand {
 
 	
 	public static void addWayPoint(Waypoint waypoint) {
+		waypoints.clear();
 		waypoints.add(waypoint);
 	}
 
