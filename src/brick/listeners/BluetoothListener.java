@@ -33,6 +33,7 @@ public class BluetoothListener implements Runnable, RCCommand {
 					ArrayList<Waypoint> waypoints = getWaypoints(packet.commands);
 					FollowPath.addAllWayPoints(waypoints);
 					FollowPath.SHOULD_TAKE_CONTROL = true;
+					FollowPath.SHOULD_BREAK = true;
 				}
 			else if(packet.getMode() == Modes.HANDSHAKE) System.out.println("Handshake made");
 			else System.out.println("Packet received?");

@@ -20,7 +20,6 @@ public  class Collision implements Behavior{
 
 	@Override
 	public void action() {
-		System.out.println("This shh");
 		navigator.stop();
 	}
 

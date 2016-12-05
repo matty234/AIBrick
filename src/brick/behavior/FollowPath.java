@@ -22,10 +22,12 @@ public class FollowPath implements Behavior, RCCommand {
 	PoseProvider poseProvider;
 	ShortestMultipointPathFinder finder = new ShortestMultipointPathFinder(LINEMAP);
 	public static boolean SHOULD_TAKE_CONTROL = false;
-	public static boolean CONTINUE = false;
 	static ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
 	public EndOfPathHandler endOfPathHandler;
-
+	
+	
+	public static boolean CONTINUE = false;
+	public static boolean SHOULD_BREAK = true;
 
 	public FollowPath(Navigator navigator, PoseProvider poseProvider) {
 		this.navigator = navigator;
@@ -51,12 +53,14 @@ public class FollowPath implements Behavior, RCCommand {
 			for (int i = 0; i < paths.length; i++) {
 				navigator.followPath(paths[i]);
 				navigator.waitForStop();
+				while(!CONTINUE) {}
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 					return;
 				}
+				CONTINUE = (SHOULD_BREAK && !CONTINUE)?false:true;
 			}
 			System.out.println("Route Finished!");
 			if(endOfPathHandler != null && waypoints.size() > 0) {
@@ -91,4 +95,5 @@ public class FollowPath implements Behavior, RCCommand {
 		this.endOfPathHandler = endOfPathHandler;
 	}
 
+	
 }
