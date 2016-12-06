@@ -69,6 +69,22 @@ public class Brick implements RCCommand {
 		System.out.println("Connection made");
 	}
 
+
+	
+	private static void setup() {
+		System.out.println("Mac: " + Bluetooth.getLocalAddress());
+		System.out.println("\n1) Calibration");
+		System.out.println("  Place robot at (0, 0)");
+		Button.ENTER.waitForPress();
+		LCD.clear();
+		System.out.println("2) Connection");
+		System.out.println("  Connect to the Robot (TaxiBot)");
+		btConnect();
+		LCD.clear();
+		addListeners();
+		System.out.println("Setup complete...");		
+	}
+	
 	private static void addListeners() {
 		
 		ultrasonicSensorPort.addSensorPortListener(customSensorPortListener);
@@ -91,20 +107,6 @@ public class Brick implements RCCommand {
 		});
 		new Thread(bluetoothListener).start();
 
-	}
-	
-	private static void setup() {
-		System.out.println("Mac: " + Bluetooth.getLocalAddress());
-		System.out.println("\n1) Calibration");
-		System.out.println("  Place robot at (0, 0)");
-		Button.ENTER.waitForPress();
-		LCD.clear();
-		System.out.println("2) Connection");
-		System.out.println("  Connect to the Robot (TaxiBot)");
-		btConnect();
-		LCD.clear();
-		addListeners();
-		System.out.println("Setup complete...");		
 	}
 	
 	public static void setEndOfPathHandler(EndOfPathHandler endOfPathHandler) {
