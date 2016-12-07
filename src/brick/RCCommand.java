@@ -47,27 +47,27 @@ public interface RCCommand {
 		STATION = 0x08;
 
 	public final static Waypoint
-		HOMEPOINT = new Waypoint(140, 535),
+		HOMEPOINT = new Waypoint(140, 540),
 		CHURCHPOINT = new Waypoint(600, 330),
 		HOSPITALPOINT = new Waypoint(745, 330),
 		SUPERMARKETPOINT = new Waypoint(745, 200),
 		OFFICEPOINT = new Waypoint(745, 90),
 		PARKPOINT = new Waypoint(450, 465),
-		STATIONPOINT = new Waypoint(235, 90),
-		SHOPPOINT = new Waypoint(255, 333);
+		STATIONPOINT = new Waypoint(210, 80),
+		SHOPPOINT = new Waypoint(255, 330);
 	  
 	  public final static Waypoint[] WAYPOINTS = {HOMEPOINT, CHURCHPOINT, HOSPITALPOINT, SUPERMARKETPOINT, OFFICEPOINT, PARKPOINT, STATIONPOINT, SHOPPOINT};
-	  
+
 	  public final Line[] ROADS = {
-			  new Line(0, 0, 0, 100),
-			  new Line(0, 90, 830, 90),
-			  new Line(450, 20, 450, 550),
-			  new Line(210, 80, 210, 550),
-			  new Line(30, 540, 460, 540),
-			  new Line(670, 80, 670, 550),
-			  new Line(660, 200, 830, 200),
-			  new Line(430, 460, 520, 460),
-			  new Line(200, 330, 830, 330)
+			  new Line(210, 100, 210, 535),
+			  new Line(210, 535, 140, 535),
+			  new Line(210, 535, 450, 535),
+			  new Line(450, 535, 450, 465),
+			  new Line(210, 330, 745, 330),
+			  new Line(666, 330, 666, 200),
+			  new Line(666, 200, 666, 745),
+			  new Line(200, 666, 200, 100)
+
 	  };
 	  
 	  public final Rectangle MAPAREA = new Rectangle(0, 0, 841, 594);

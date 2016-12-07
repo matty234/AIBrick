@@ -25,7 +25,7 @@ public class CustomSensorPortListener implements SensorPortListener {
 	@Override
 	public void stateChanged(SensorPort aSource, int aOldValue, int aNewValue) {
 		if(aSource == Brick.lightSensorPort) {
-			if(aNewValue > LIGHT_THRESHOLD) {
+			/*if(aNewValue > LIGHT_THRESHOLD) {
 				System.out.println("Going home!");
 				FollowPath.addWayPoint(RCCommand.HOMEPOINT);
 				FollowPath.SHOULD_TAKE_CONTROL = true;
@@ -41,12 +41,12 @@ public class CustomSensorPortListener implements SensorPortListener {
 						System.exit(0);
 					}
 				});
-			}
+			}*/
 		} else if(aSource == Brick.soundSensorPort){
-			if(aNewValue - aOldValue >= CLAP_THRESHOLD && System.currentTimeMillis() > NEXT_SOUND_CHANGE) {
+			/*if(aNewValue - aOldValue >= CLAP_THRESHOLD && System.currentTimeMillis() > NEXT_SOUND_CHANGE) {
 				NEXT_SOUND_CHANGE = System.currentTimeMillis() + 2000l;
 				System.out.println("Registered Clap");
-			}
+			}*/
 		} else if(aSource == Brick.ultrasonicSensorPort) {
 			
 			/*if(sensor.getDistance() <= COLLISION_THRESHOLD) Collision.SHOULD_TAKE_CONTROL = true;
