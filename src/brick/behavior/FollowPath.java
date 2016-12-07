@@ -6,6 +6,7 @@ import brick.Brick;
 import brick.RCCommand;
 import brick.ShortestMultipointPathFinder;
 import brick.handler.EndOfPathHandler;
+import lejos.nxt.Button;
 import lejos.nxt.Motor;
 import lejos.nxt.Sound;
 import lejos.robotics.localization.OdometryPoseProvider;
@@ -26,7 +27,6 @@ public class FollowPath implements Behavior, RCCommand {
 	public EndOfPathHandler endOfPathHandler;
 	
 	
-	public static boolean CONTINUE = false;
 	public static boolean SHOULD_BREAK = true;
 
 	public FollowPath(Navigator navigator, PoseProvider poseProvider) {
@@ -53,14 +53,17 @@ public class FollowPath implements Behavior, RCCommand {
 			for (int i = 0; i < paths.length; i++) {
 				navigator.followPath(paths[i]);
 				navigator.waitForStop();
-				while(!CONTINUE) {}
+				System.out.println(" -> Segment Dn");
+				if (SHOULD_BREAK&& i != paths.length - 1) {
+					Button.RIGHT.waitForPress();
+					System.out.println(" -> Segment ->");
+				}
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 					return;
 				}
-				CONTINUE = (SHOULD_BREAK && !CONTINUE)?false:true;
 			}
 			System.out.println("Route Finished!");
 			if(endOfPathHandler != null && waypoints.size() > 0) {

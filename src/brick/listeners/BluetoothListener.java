@@ -11,6 +11,7 @@ import brick.RobotPacket;
 import brick.RCCommand.Modes;
 import brick.behavior.FollowPath;
 import lejos.nxt.Button;
+import lejos.nxt.LCD;
 import lejos.nxt.Sound;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
@@ -30,6 +31,8 @@ public class BluetoothListener implements Runnable, RCCommand {
 		RobotPacket packet;
 		while((packet = readRobotPacket()) != null) {
 			if(packet.getMode() == Modes.NAVIGATE) {
+					LCD.clear();
+					System.out.println("Rec Job");
 					ArrayList<Waypoint> waypoints = getWaypoints(packet.commands);
 					FollowPath.addAllWayPoints(waypoints);
 					FollowPath.SHOULD_TAKE_CONTROL = true;
