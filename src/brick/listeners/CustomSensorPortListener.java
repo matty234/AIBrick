@@ -5,7 +5,7 @@ import brick.RCCommand;
 import brick.behavior.Collision;
 import brick.behavior.FollowPath;
 import brick.behavior.FreeRoam;
-import brick.handler.EndOfPathHandler;
+import brick.handler.PathHandler;
 import lejos.nxt.LCD;
 import lejos.nxt.SensorPort;
 import lejos.nxt.SensorPortListener;
@@ -30,7 +30,10 @@ public class CustomSensorPortListener implements SensorPortListener {
 				FollowPath.addWayPoint(RCCommand.HOMEPOINT);
 				FollowPath.SHOULD_TAKE_CONTROL = true;
 				FreeRoam.SHOULD_TAKE_CONTROL = false;
-				Brick.setEndOfPathHandler(new EndOfPathHandler() {
+				Brick.setPathHandler(new PathHandler() {
+					@Override
+					public void onFinishedPathSegment() {}
+
 					@Override
 					public void onEndOfPath(int fare) {
 						LCD.clear();

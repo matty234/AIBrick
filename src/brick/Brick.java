@@ -5,7 +5,7 @@ import java.io.IOException;
 import brick.behavior.Collision;
 import brick.behavior.FollowPath;
 import brick.behavior.FreeRoam;
-import brick.handler.EndOfPathHandler;
+import brick.handler.PathHandler;
 import brick.listeners.BluetoothListener;
 import brick.listeners.CustomButtonListener;
 import brick.listeners.CustomSensorPortListener;
@@ -95,7 +95,10 @@ public class Brick implements RCCommand {
 		Button.ESCAPE.addButtonListener(buttonListener);
 		Button.ENTER.addButtonListener(buttonListener);
 		bluetoothListener = new BluetoothListener(connection);
-		setEndOfPathHandler(new EndOfPathHandler() {
+		setPathHandler(new PathHandler() {
+			@Override
+			public void onFinishedPathSegment() {}
+			
 			@Override
 			public void onEndOfPath(int fare) {
 				try {
@@ -109,7 +112,7 @@ public class Brick implements RCCommand {
 
 	}
 	
-	public static void setEndOfPathHandler(EndOfPathHandler endOfPathHandler) {
+	public static void setPathHandler(PathHandler endOfPathHandler) {
 		followPathBehavior.addOnEndOfPathHandler(endOfPathHandler);
 	}
 }

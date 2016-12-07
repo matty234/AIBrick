@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import brick.Brick;
 import brick.RCCommand;
 import brick.ShortestMultipointPathFinder;
-import brick.handler.EndOfPathHandler;
+import brick.handler.PathHandler;
 import lejos.nxt.Motor;
 import lejos.nxt.Sound;
 import lejos.robotics.localization.OdometryPoseProvider;
@@ -23,7 +23,7 @@ public class FollowPath implements Behavior, RCCommand {
 	ShortestMultipointPathFinder finder = new ShortestMultipointPathFinder(LINEMAP);
 	public static boolean SHOULD_TAKE_CONTROL = false;
 	static ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
-	public EndOfPathHandler endOfPathHandler;
+	public PathHandler pathHandler;
 	
 	
 	public static boolean CONTINUE = false;
@@ -42,7 +42,7 @@ public class FollowPath implements Behavior, RCCommand {
 	@Override
 	public void action() {
 		int initTachoCount = Motor.A.getTachoCount();
-			Path[] paths;
+		Path[] paths;
 			try {
 				paths = finder.findPaths(poseProvider.getPose(), waypoints);
 			} catch (DestinationUnreachableException e) {
@@ -53,6 +53,8 @@ public class FollowPath implements Behavior, RCCommand {
 			for (int i = 0; i < paths.length; i++) {
 				navigator.followPath(paths[i]);
 				navigator.waitForStop();
+				if(pathHandler != null) pathHandler.onFinishedPathSegment();
+				
 				while(!CONTINUE) {}
 				try {
 					Thread.sleep(500);
@@ -63,8 +65,8 @@ public class FollowPath implements Behavior, RCCommand {
 				CONTINUE = (SHOULD_BREAK && !CONTINUE)?false:true;
 			}
 			System.out.println("Route Finished!");
-			if(endOfPathHandler != null && waypoints.size() > 0) {
-				endOfPathHandler.onEndOfPath(Motor.A.getTachoCount()-initTachoCount); // TODO Actually calculate distance
+			if(pathHandler != null && waypoints.size() > 0) {
+				pathHandler.onEndOfPath(Motor.A.getTachoCount()-initTachoCount); // TODO Actually calculate distance
 			}
 			waypoints.clear();
 			Sound.systemSound(false, 3);
@@ -91,8 +93,8 @@ public class FollowPath implements Behavior, RCCommand {
 		waypoints.addAll(wp);
 	}
 	
-	public void addOnEndOfPathHandler(EndOfPathHandler endOfPathHandler) {
-		this.endOfPathHandler = endOfPathHandler;
+	public void addOnEndOfPathHandler(PathHandler pathHandler) {
+		this.pathHandler = pathHandler;
 	}
 
 	
