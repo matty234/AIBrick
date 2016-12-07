@@ -36,30 +36,41 @@ public interface RCCommand {
 	  public final byte  // PILOT
 	  	LOCATION = 0x01;
 	  	
-	  public final byte  // PILOT
-	  	HOME = 0x01,
-	  	SHOP = 0x02,
-	  	PARK = 0x03,
-	  	OFFICE = 0x04;
-	  
+	  public final byte
+		HOME = 0x01,
+		SHOP = 0x02,
+		PARK = 0x03,
+		OFFICE = 0x04,
+		CHURCH = 0x05,
+		HOSPITAL = 0x06,
+		SUPERMARKET = 0x07,
+		STATION = 0x08;
 
-	  public final static Waypoint
-	  	HOMEPOINT = new Waypoint(100, 100),
-	  	SHOPPOINT = new Waypoint(600, 100),
-	  	PARKPOINT = new Waypoint(100, 600),
-	  	OFFICEPOINT = new Waypoint(600, 600);
+	public final static Waypoint
+		HOMEPOINT = new Waypoint(140, 535),
+		CHURCHPOINT = new Waypoint(600, 330),
+		HOSPITALPOINT = new Waypoint(745, 330),
+		SUPERMARKETPOINT = new Waypoint(745, 200),
+		OFFICEPOINT = new Waypoint(745, 90),
+		PARKPOINT = new Waypoint(450, 465),
+		STATIONPOINT = new Waypoint(235, 90),
+		SHOPPOINT = new Waypoint(255, 333);
 	  
-	  public final static Waypoint[] WAYPOINTS = {HOMEPOINT, SHOPPOINT, PARKPOINT, OFFICEPOINT};
+	  public final static Waypoint[] WAYPOINTS = {HOMEPOINT, CHURCHPOINT, HOSPITALPOINT, SUPERMARKETPOINT, OFFICEPOINT, PARKPOINT, STATIONPOINT, SHOPPOINT};
 	  
 	  public final Line[] ROADS = {
-			  new Line(0, 0, (int) HOMEPOINT.getX(), (int) HOMEPOINT.getY()),
-			  new Line((int) HOMEPOINT.getX(), (int) HOMEPOINT.getY(), (int) SHOPPOINT.getX(), (int) SHOPPOINT.getY()),
-			  new Line((int) SHOPPOINT.getX(), (int) SHOPPOINT.getY(), (int) OFFICEPOINT.getX(), (int) OFFICEPOINT.getY()),
-			  new Line((int) SHOPPOINT.getX(), (int) SHOPPOINT.getY(), (int) PARKPOINT.getX(), (int) PARKPOINT.getY()),
-			  new Line((int) PARKPOINT.getX(), (int) PARKPOINT.getY(), (int) OFFICEPOINT.getX(), (int) OFFICEPOINT.getY()),
+			  new Line(0, 0, 0, 100),
+			  new Line(0, 90, 830, 90),
+			  new Line(450, 20, 450, 550),
+			  new Line(210, 80, 210, 550),
+			  new Line(30, 540, 460, 540),
+			  new Line(670, 80, 670, 550),
+			  new Line(660, 200, 830, 200),
+			  new Line(430, 460, 520, 460),
+			  new Line(200, 330, 830, 330)
 	  };
 	  
-	  public final Rectangle MAPAREA = new Rectangle(0, 0, 965, 650);
+	  public final Rectangle MAPAREA = new Rectangle(0, 0, 841, 594);
 	  public final LineMap LINEMAP = new LineMap(ROADS, MAPAREA);
 	  
 

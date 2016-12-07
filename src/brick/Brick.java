@@ -30,7 +30,7 @@ import lejos.robotics.subsumption.Behavior;
 public class Brick implements RCCommand {
 	public static BTConnection connection;
 
-	private static DifferentialPilot differentialPilot = new DifferentialPilot(57, 120, Motor.A, Motor.B);
+	private static DifferentialPilot differentialPilot = new DifferentialPilot(80, 155, Motor.A, Motor.B);
 	private static Navigator navigator = new Navigator(differentialPilot);
 	private static PoseProvider poseProvider = new OdometryPoseProvider(differentialPilot);
 
@@ -86,11 +86,9 @@ public class Brick implements RCCommand {
 	}
 	
 	private static void addListeners() {
-		
 		ultrasonicSensorPort.addSensorPortListener(customSensorPortListener);
 		lightSensorPort.addSensorPortListener(customSensorPortListener);
 		soundSensorPort.addSensorPortListener(customSensorPortListener);
-		
 		
 		Button.ESCAPE.addButtonListener(buttonListener);
 		Button.ENTER.addButtonListener(buttonListener);
@@ -109,7 +107,6 @@ public class Brick implements RCCommand {
 			}
 		});
 		new Thread(bluetoothListener).start();
-
 	}
 	
 	public static void setPathHandler(PathHandler endOfPathHandler) {

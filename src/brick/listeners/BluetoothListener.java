@@ -8,13 +8,10 @@ import java.util.ArrayList;
 import brick.Brick;
 import brick.RCCommand;
 import brick.RobotPacket;
-import brick.RCCommand.Modes;
 import brick.behavior.FollowPath;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
-import lejos.nxt.Sound;
 import lejos.nxt.comm.BTConnection;
-import lejos.nxt.comm.Bluetooth;
 import lejos.robotics.navigation.Waypoint;
 
 public class BluetoothListener implements Runnable, RCCommand {
@@ -93,9 +90,13 @@ public class BluetoothListener implements Runnable, RCCommand {
 		ArrayList<Waypoint> waypoints = new  ArrayList<>();
 		for (int i = 0; i < commands.length; i++) {
 			if(commands[i] == HOME) waypoints.add(HOMEPOINT);
-			else if (commands[i] == OFFICE) waypoints.add(OFFICEPOINT);
-			else if (commands[i] == PARK) waypoints.add(PARKPOINT);
 			else if (commands[i] == SHOP) waypoints.add(SHOPPOINT);
+			else if (commands[i] == PARK) waypoints.add(PARKPOINT);
+			else if (commands[i] == OFFICE) waypoints.add(OFFICEPOINT);
+			else if (commands[i] == CHURCH) waypoints.add(CHURCHPOINT);
+			else if (commands[i] == HOSPITAL) waypoints.add(HOSPITALPOINT);
+			else if (commands[i] == SUPERMARKET) waypoints.add(SUPERMARKETPOINT);
+			else if (commands[i] == STATION) waypoints.add(STATIONPOINT);
 			else;
 		}
 		return waypoints;

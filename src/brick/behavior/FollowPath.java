@@ -43,36 +43,30 @@ public class FollowPath implements Behavior, RCCommand {
 	public void action() {
 		int initTachoCount = Motor.A.getTachoCount();
 		Path[] paths;
-			try {
-				paths = finder.findPaths(poseProvider.getPose(), waypoints);
-			} catch (DestinationUnreachableException e) {
-				SHOULD_TAKE_CONTROL = false;
-				System.out.println("Could not reach the destination");
-				return;
-			}
-			for (int i = 0; i < paths.length; i++) {
-				navigator.followPath(paths[i]);
-				navigator.waitForStop();
-
-				System.out.println(" -> Segment Dn");
-				if (SHOULD_BREAK&& i != paths.length - 1) {
-					Button.RIGHT.waitForPress();
-					System.out.println(" -> Segment ->");
-				}
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					return;
-				}
-			}
-			System.out.println("Route Finished!");
-			if(pathHandler != null && waypoints.size() > 0) {
-				pathHandler.onEndOfPath(Motor.A.getTachoCount()-initTachoCount); // TODO Actually calculate distance
-			}
-			waypoints.clear();
-			Sound.systemSound(false, 3);
+		try {
+			paths = finder.findPaths(poseProvider.getPose(), waypoints);
+		} catch (DestinationUnreachableException e) {
 			SHOULD_TAKE_CONTROL = false;
+			System.out.println("Could not reach the destination");
+			return;
+		}
+		for (int i = 0; i < paths.length; i++) {
+			navigator.followPath(paths[i]);
+			navigator.waitForStop();
+			
+			System.out.println(" -> Segment Dn");
+			if (SHOULD_BREAK && i != paths.length - 1) {
+				Button.RIGHT.waitForPress();
+				System.out.println(" -> Segment ->");
+			}
+		}
+		System.out.println("Route Finished!");
+		if (pathHandler != null && waypoints.size() > 0) {
+			pathHandler.onEndOfPath(Motor.A.getTachoCount() - initTachoCount); 
+		}
+		waypoints.clear();
+		Sound.systemSound(false, 3);
+		SHOULD_TAKE_CONTROL = false;
 
 	}
 
