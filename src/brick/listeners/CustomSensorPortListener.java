@@ -16,7 +16,7 @@ public class CustomSensorPortListener implements SensorPortListener {
 	private final int COLLISION_THRESHOLD = 65;
 	private final int CLAP_THRESHOLD = 30;
 	private final UltrasonicSensor sensor;
-	private long NEXT_LIGHT_CHANGE = 0;
+	private long NEXT_SOUND_CHANGE = System.currentTimeMillis() + 2000l;
 
 	public CustomSensorPortListener(UltrasonicSensor sensor) {
 		this.sensor = sensor;
@@ -43,9 +43,9 @@ public class CustomSensorPortListener implements SensorPortListener {
 				});
 			}
 		} else if(aSource == Brick.soundSensorPort){
-			if(aNewValue - aOldValue >= CLAP_THRESHOLD && System.currentTimeMillis() > NEXT_LIGHT_CHANGE) {
-				NEXT_LIGHT_CHANGE = System.currentTimeMillis() + 2000l;
-				FollowPath.CONTINUE = true;
+			if(aNewValue - aOldValue >= CLAP_THRESHOLD && System.currentTimeMillis() > NEXT_SOUND_CHANGE) {
+				NEXT_SOUND_CHANGE = System.currentTimeMillis() + 2000l;
+				System.out.println("Registered Clap");
 			}
 		} else if(aSource == Brick.ultrasonicSensorPort) {
 			
